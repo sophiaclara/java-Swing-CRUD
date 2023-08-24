@@ -4,9 +4,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Action extends JFrame {
-    private ArrayList<Peserta> pesertaList = new ArrayList<>();
+    private List<Peserta> pesertaList = new ArrayList<>();
     private DefaultTableModel tableModel;
     private JTable pesertaTable;
     private JButton addButton, deleteButton, updateButton;
@@ -83,13 +84,13 @@ public class Action extends JFrame {
             //panel untuk update
             JPanel updatePanel = new JPanel(new GridLayout(3, 2));
             updatePanel.add(new JLabel("Nama:"));
-            namaField = new JTextField(peserta.nama, 20);
+            namaField = new JTextField(peserta.getNama(), 20);
             updatePanel.add(namaField);
             updatePanel.add(new JLabel("Alamat:"));
-            alamatField = new JTextField(peserta.alamat, 20);
+            alamatField = new JTextField(peserta.getAlamat(), 20);
             updatePanel.add(alamatField);
             updatePanel.add(new JLabel("Telepon:"));
-            teleponField = new JTextField(peserta.telepon, 20);
+            teleponField = new JTextField(peserta.getTelepon(), 20);
             updatePanel.add(teleponField);
 
             int result = JOptionPane.showConfirmDialog(null, updatePanel, "Update Peserta",
@@ -101,25 +102,25 @@ public class Action extends JFrame {
                 String newTelepon = teleponField.getText();
 
                 if (!newNama.isEmpty()) {
-                    peserta.nama = newNama;
+                    peserta.setNama(newNama);
                 }
                 if (!newAlamat.isEmpty()) {
-                    peserta.alamat = newAlamat;
+                    peserta.setAlamat(newAlamat);
                 }
                 if (!newTelepon.isEmpty()) {
-                    peserta.telepon = newTelepon;
+                    peserta.setTelepon(newTelepon);
                 }
-
                 //update data dalam tabel
-                tableModel.setValueAt(peserta.nama, selectedRowIndex, 0);
-                tableModel.setValueAt(peserta.alamat, selectedRowIndex, 1);
-                tableModel.setValueAt(peserta.telepon, selectedRowIndex, 2);
+                tableModel.setValueAt(peserta.getNama(), selectedRowIndex, 0);
+                tableModel.setValueAt(peserta.getAlamat(), selectedRowIndex, 1);
+                tableModel.setValueAt(peserta.getTelepon(), selectedRowIndex, 2);
 
                 clearFields();
                 updateButtonsState();
             }
         }
     }
+
     //kosongkan input field
     private void clearFields() {
         namaField.setText("");
@@ -134,7 +135,7 @@ public class Action extends JFrame {
         updateButton.setEnabled(selectedRowIndex != -1);
     }
 
-    //tampilkan hasil input
+    //form tambah
     private void showInputForm() {
         JPanel inputPanel = new JPanel(new GridLayout(3, 2));
         inputPanel.add(new JLabel("Nama:"));
@@ -151,9 +152,9 @@ public class Action extends JFrame {
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (result == JOptionPane.OK_OPTION) {
-            String nama = namaField.getText();
-            String alamat = alamatField.getText();
-            String telepon = teleponField.getText();
+            String nama = namaField.getText().trim();
+            String alamat = alamatField.getText().trim();
+            String telepon = teleponField.getText().trim();
 
             if (nama.isEmpty() || alamat.isEmpty() || telepon.isEmpty()) {
                 String errorMessage = "Data berikut tidak boleh kosong:\n";
@@ -169,13 +170,16 @@ public class Action extends JFrame {
                 }
 
                 JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (nama.replaceAll("\\s+", "").isEmpty() || alamat.replaceAll("\\s+", "").isEmpty() || telepon.replaceAll("\\s+", "").isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Data tidak boleh hanya berisi spasi!", "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (!telepon.matches("\\d+")) {
+                JOptionPane.showMessageDialog(null, "Nomor telepon harus berisi angka saja!", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 Peserta peserta = new Peserta(nama, alamat, telepon);
                 pesertaList.add(peserta);
                 tableModel.addRow(new Object[]{nama, alamat, telepon});
                 clearFields();
             }
-
         }
     }
 }
